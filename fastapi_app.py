@@ -105,9 +105,9 @@ def get_purchased_products(conn):
 
 def update_purchased_product(conn, id, status):
     cursor = conn.cursor()
-    cursor.execute('UPDATE status = ? WHERE id = ?', (status, id))
+    cursor.execute('UPDATE purchased SET status = ? WHERE id = ?', (status, id))
     conn.commit()
-    return {"message": "Purchased Product Info updated successfully!"}
+    return {"message": f"Purchased Product Info updated to \"{status}\" successfully!"}
 
 @app.on_event("startup")
 async def startup_event():
@@ -169,6 +169,6 @@ async def get_purchased_products_endpoint():
 @app.get("/update_purchased_info")
 async def update_purchased_info_endpoint(id: int, status: str):
     conn = create_connection()
-    result = update_user_info(conn, id, status)
+    result = update_purchased_product(conn, id, status)
     conn.close()
     return result

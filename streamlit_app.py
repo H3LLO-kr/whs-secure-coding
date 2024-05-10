@@ -72,8 +72,34 @@ def main():
                 st.subheader('Purchased products management')
                 response = requests.get('http://localhost:8000/purchased')
                 purchaseds = response.json()
-                with st.form(key='purchased_products_mng_form'):
-                    selected_product = st.selectbox('Select Purchased Product', [purchased['id'] for purchased in purchaseds])
+                purchased = dict()
+                selected_product = st.selectbox('Select Purchased Product', [purchased['id'] for purchased in purchaseds])
+                for purchased in purchaseds:
+                    if purchased['id'] == selected_product:
+                        break
+                st.write(f"Name: {purchased['username']}")
+                st.write(f"Product Name: {purchased['product_name']}")
+                st.write(f"Address: {purchased['address']}")
+                st.write(f"Payment info: {purchased['payment_info']}")
+                st.write(f"Status: {purchased['status']}")
+                if purchased['status'] == "Not Sended" :
+                    send_button = st.button("Send")
+                    if send_button:
+                        response = requests.get('http://localhost:8000/update_purchased_info', params={"id": purchased['id'], "status": "Sended"})
+                        if response.status_code == 200:
+                            st.success(response.json()["message"])
+                        else:
+                            st.error("Failed to change status")
+                elif purchased['status'] == "Sended" :
+                    send_button = st.button("Cancle Send")
+                    if send_button:
+                        response = requests.get('http://localhost:8000/update_purchased_info', params={"id": purchased['id'], "status": "Not Sended"})
+                        if response.status_code == 200:
+                            st.success(response.json()["message"])
+                        else:
+                            st.error("Failed to change status")
+                else :
+                    st.error("Status Error")
                     
             if st.sidebar.button('Logout'):
                 st.session_state.logged_in = False
